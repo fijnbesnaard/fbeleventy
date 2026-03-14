@@ -1,0 +1,95 @@
+/* ============================================================
+   RESET
+   Modern, minimal reset. Based on Andy Bell's "A Modern CSS Reset"
+   with adjustments for this architecture.
+   ============================================================ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  /* Prevent font size inflation on mobile */
+  -moz-text-size-adjust: none;
+  -webkit-text-size-adjust: none;
+  text-size-adjust: none;
+
+  /* Smooth scrolling, but respect motion preferences */
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+body {
+  min-height: 100dvh;
+  line-height: var(--leading-normal);
+}
+
+/* Prevent overflow from long words/URLs */
+p, h1, h2, h3, h4, h5, h6 {
+  overflow-wrap: break-word;
+}
+
+/* Better heading line wrapping in modern browsers */
+h1, h2, h3, h4, h5, h6 {
+  text-wrap: balance;
+}
+
+p, li {
+  text-wrap: pretty;
+}
+
+/* Remove list styles when a list has role="list" */
+ul[role="list"],
+ol[role="list"] {
+  list-style: none;
+}
+
+/* Images and media */
+img, picture, video, canvas, svg {
+  display: block;
+  max-width: 100%;
+}
+
+img {
+  height: auto;
+}
+
+/* Form elements inherit typography */
+input, button, textarea, select {
+  font: inherit;
+}
+
+/* Remove default button styles */
+button {
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+/* Anchor reset */
+a {
+  color: inherit;
+  text-decoration-skip-ink: auto;
+}
+
+/* Table */
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}

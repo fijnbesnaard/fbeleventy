@@ -1,0 +1,83 @@
+# Sveltia CMS Configuration
+# Place this file at: src/static/admin/config.yml
+# The admin panel lives at: yourdomain.com/admin/
+
+backend:
+  name: github          # or gitlab
+  repo: owner/repo-name
+  branch: main
+
+# For local development: use the local backend proxy
+# Run: npx @sveltia/cms-backend-proxy
+# local_backend: true
+
+media_folder:  "src/static/images/uploads"
+public_folder: "/images/uploads"
+
+# ── i18n ──────────────────────────────────────────────────────
+# Remove or simplify if the project is single-language
+i18n:
+  structure:  multiple_folders   # creates /nl/, /en/ subfolders
+  locales:    [nl, en]
+  default_locale: nl
+
+# ── Collections ───────────────────────────────────────────────
+collections:
+
+  # Pages
+  - name: pages
+    label: Pagina's
+    label_singular: Pagina
+    folder: src/content/pages
+    create: true
+    slug: "{{slug}}"
+    i18n: true
+    fields:
+      - { label: Layout,      name: layout,      widget: hidden, default: layouts/page.njk }
+      - { label: Titel,       name: title,       widget: string }
+      - { label: Omschrijving, name: description, widget: string, hint: "Voor SEO en Open Graph (max 160 tekens)" }
+      - { label: Inhoud,      name: body,        widget: markdown }
+      - label: OG Afbeelding
+        name: ogImage
+        widget: image
+        required: false
+      - label: Verberg van zoekmachines
+        name: noIndex
+        widget: boolean
+        default: false
+        required: false
+
+  # Blog posts
+  - name: posts
+    label: Berichten
+    label_singular: Bericht
+    folder: src/content/posts
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    i18n: true
+    fields:
+      - { label: Layout,      name: layout,      widget: hidden, default: layouts/post.njk }
+      - { label: Titel,       name: title,       widget: string }
+      - { label: Omschrijving, name: description, widget: string }
+      - { label: Datum,       name: date,        widget: datetime, date_format: YYYY-MM-DD, time_format: false }
+      - label: Tags
+        name: tags
+        widget: list
+        default: [posts]
+      - { label: Inhoud, name: body, widget: markdown }
+      - label: OG Afbeelding
+        name: ogImage
+        widget: image
+        required: false
+
+  # Site settings (singleton)
+  - name: settings
+    label: Instellingen
+    files:
+      - label: Algemeen
+        name: general
+        file: src/_data/site.js
+        fields:
+          - { label: Sitenaam,     name: title,       widget: string }
+          - { label: Omschrijving, name: description,  widget: string }
+          - { label: URL,          name: url,          widget: string }

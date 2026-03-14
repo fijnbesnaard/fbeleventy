@@ -1,0 +1,31 @@
+/* ============================================================
+   TOKENS — SPACING
+   Rem-based, loosely defined. Not a rigid mathematical scale —
+   values are chosen for practical usefulness at each step.
+   Use these for margin, padding, gap, and similar properties.
+   ============================================================ */
+
+:root {
+  --space-1:  0.25rem;   /*   4px — hairline gaps, fine details */
+  --space-2:  0.5rem;    /*   8px — tight internal padding */
+  --space-3:  0.75rem;   /*  12px — compact elements */
+  --space-4:  1rem;      /*  16px — base unit, default gap */
+  --space-5:  1.25rem;   /*  20px */
+  --space-6:  1.5rem;    /*  24px — comfortable padding */
+  --space-8:  2rem;      /*  32px — section internals */
+  --space-10: 2.5rem;    /*  40px */
+  --space-12: 3rem;      /*  48px — generous breathing room */
+  --space-16: 4rem;      /*  64px — section gaps */
+  --space-20: 5rem;      /*  80px */
+  --space-24: 6rem;      /*  96px — hero/large section spacing */
+  --space-32: 8rem;      /* 128px — page-level vertical rhythm */
+
+  /* Semantic spacing aliases — use these in components */
+  --space-component-padding-sm: var(--space-4);
+  --space-component-padding-md: var(--space-6);
+  --space-component-padding-lg: var(--space-8);
+
+  --space-section-gap-sm:  var(--space-12);
+  --space-section-gap-md:  var(--space-16);
+  --space-section-gap-lg:  var(--space-24);
+}

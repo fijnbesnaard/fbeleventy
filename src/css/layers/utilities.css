@@ -1,0 +1,58 @@
+/* ============================================================
+   UTILITIES
+   Single-purpose helper classes. Use sparingly — if you're
+   using the same utility combination repeatedly, make a component.
+   ============================================================ */
+
+/* --- Visibility --- */
+.sr-only {
+  position:   absolute;
+  width:      1px;
+  height:     1px;
+  padding:    0;
+  margin:     -1px;
+  overflow:   hidden;
+  clip:       rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border:     0;
+}
+
+.hidden { display: none; }
+
+/* --- Text --- */
+.text-center  { text-align: center; }
+.text-right   { text-align: right; }
+.text-muted   { color: var(--color-text-muted); }
+.text-sm      { font-size: var(--text-sm); }
+.text-lg      { font-size: var(--text-lg); }
+.text-bold    { font-weight: var(--weight-bold); }
+.no-wrap      { white-space: nowrap; }
+
+/* --- Spacing helpers (use sparingly, prefer components/layout) --- */
+.mt-auto { margin-block-start: auto; }
+.mb-auto { margin-block-end: auto; }
+.mx-auto { margin-inline: auto; }
+
+/* --- Color backgrounds (for quick section theming) --- */
+.bg-subtle  { background-color: var(--color-bg-subtle); }
+.bg-muted   { background-color: var(--color-bg-muted); }
+.bg-primary { background-color: var(--color-primary); color: var(--color-primary-text); }
+
+/* --- Borders --- */
+.border-top    { border-block-start: 1px solid var(--color-border); }
+.border-bottom { border-block-end: 1px solid var(--color-border); }
+
+/* --- Responsive show/hide --- */
+.hide-mobile {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .hide-mobile  { display: revert; }
+  .hide-tablet  { display: none; }
+}
+
+@media (min-width: 1024px) {
+  .hide-tablet  { display: revert; }
+  .hide-desktop { display: none; }
+}

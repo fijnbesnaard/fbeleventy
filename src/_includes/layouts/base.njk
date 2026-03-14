@@ -1,0 +1,106 @@
+{#- ============================================================
+    LAYOUT: base.njk
+    Root HTML layout. All other layouts extend this one.
+    Variables (set in front matter or parent layouts):
+      title        — page title (falls back to site.title)
+      description  — meta description
+      ogImage      — Open Graph image URL (optional)
+      locale       — page language, e.g. "nl" (falls back to site.language)
+      noIndex      — set true to add noindex (e.g. thank-you pages)
+    ============================================================ #}
+
+{%- set pageTitle      = title + " | " + site.title if title else site.title -%}
+{%- set pageDesc       = description | default(site.description) -%}
+{%- set pageLocale     = locale | default(site.language) -%}
+{%- set pageUrl        = site.url + page.url -%}
+{%- set pageOgImage    = ogImage | default(site.url + "/images/og-default.jpg") -%}
+{%- set t              = i18n[pageLocale] -%}
+
+<!DOCTYPE html>
+<html lang="{{ pageLocale }}" data-theme="">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  {# ── Primary meta ── #}
+  <title>{{ pageTitle }}</title>
+  <meta name="description" content="{{ pageDesc | truncate(160) }}">
+  <link rel="canonical" href="{{ pageUrl }}">
+  {% if noIndex %}<meta name="robots" content="noindex, nofollow">{% endif %}
+
+  {# ── Open Graph ── #}
+  <meta property="og:type"        content="website">
+  <meta property="og:url"         content="{{ pageUrl }}">
+  <meta property="og:title"       content="{{ pageTitle }}">
+  <meta property="og:description" content="{{ pageDesc | truncate(160) }}">
+  <meta property="og:image"       content="{{ pageOgImage }}">
+  <meta property="og:locale"      content="{{ site.locale }}">
+  <meta property="og:site_name"   content="{{ site.title }}">
+
+  {# ── Twitter / X card ── #}
+  <meta name="twitter:card"        content="summary_large_image">
+  <meta name="twitter:title"       content="{{ pageTitle }}">
+  <meta name="twitter:description" content="{{ pageDesc | truncate(160) }}">
+  <meta name="twitter:image"       content="{{ pageOgImage }}">
+
+  {# ── Favicons — place files in /src/static/ ── #}
+  <link rel="icon"             href="/favicon.ico" sizes="any">
+  <link rel="icon"             href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="manifest"         href="/site.webmanifest">
+  <meta name="theme-color"     content="{{ site.themeColor }}">
+
+  {# ── RSS feed ── #}
+  <link rel="alternate" type="application/atom+xml"
+        title="{{ site.title }}" href="/feed.xml">
+
+  {# ── Fonts — preload critical font files ── #}
+  {# Uncomment and update when fonts are added:
+  <link rel="preload" href="/fonts/ProjectSans-Regular.woff2"
+        as="font" type="font/woff2" crossorigin>
+  #}
+
+  {# ── CSS ── #}
+  <link rel="stylesheet" href="/css/main.css">
+
+  {# ── Per-page head additions ── #}
+  {% block head %}{% endblock %}
+</head>
+
+<body>
+
+  {# Skip to main content — keyboard / screen reader navigation #}
+  <a href="#main" class="skip-link sr-only">
+    {{ t.aria.skipToMain }}
+  </a>
+
+  {# ── Site header ── #}
+  {% include "partials/header.njk" %}
+
+  {# ── Page content ── #}
+  <main id="main" tabindex="-1">
+    {% block content %}{% endblock %}
+  </main>
+
+  {# ── Site footer ── #}
+  {% include "partials/footer.njk" %}
+
+  {# ── Theme toggle script (inline, no flash) ── #}
+  <script>
+    // Apply saved theme before paint to prevent flash
+    (function () {
+      const saved = localStorage.getItem("theme");
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      const theme = saved || (prefersDark ? "dark" : "light");
+      document.documentElement.dataset.theme = theme;
+    })();
+  </script>
+
+  {# ── Main JS ── #}
+  <script type="module" src="/js/main.js"></script>
+
+  {# ── Per-page script additions ── #}
+  {% block scripts %}{% endblock %}
+
+</body>
+</html>

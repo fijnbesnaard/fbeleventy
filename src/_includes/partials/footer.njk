@@ -1,0 +1,23 @@
+{#- ============================================================
+    PARTIAL: footer.njk
+    ============================================================ #}
+
+{%- set t = i18n[locale | default(site.language)] -%}
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="site-footer__inner flex flex--between flex--wrap">
+
+      <p class="text-muted text-sm">
+        &copy; {% year %} {{ site.title }}.
+        {{ t.footer.rights }}.
+      </p>
+
+      <p class="text-muted text-sm">
+        {{ t.footer.builtBy }}
+        <a href="{{ site.author.url }}">{{ site.author.name }}</a>
+      </p>
+
+    </div>
+  </div>
+</footer>

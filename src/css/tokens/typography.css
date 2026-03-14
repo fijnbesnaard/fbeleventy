@@ -1,0 +1,46 @@
+/* ============================================================
+   TOKENS — TYPOGRAPHY
+   Scale based on a 1.25 ratio (Major Third).
+   Font families are placeholders — swap per project.
+   Custom fonts are loaded via @font-face in base.css.
+   ============================================================ */
+
+:root {
+  /* --- Font families --- */
+  --font-sans:  "ProjectSans", system-ui, sans-serif;
+  --font-serif: "ProjectSerif", Georgia, serif;
+  --font-mono:  "ProjectMono", "Courier New", monospace;
+
+  /* Assign roles — swap these per project, not the scale */
+  --font-body:    var(--font-sans);
+  --font-heading: var(--font-sans);
+  --font-ui:      var(--font-sans);
+
+  /* --- Font weights --- */
+  --weight-regular:   400;
+  --weight-medium:    500;
+  --weight-semibold:  600;
+  --weight-bold:      700;
+
+  /* --- Type scale (rem, 1.25 ratio, base 1rem = 16px) --- */
+  --text-xs:   0.64rem;   /*  ~10px */
+  --text-sm:   0.8rem;    /*  ~13px */
+  --text-base: 1rem;      /*   16px */
+  --text-md:   1.25rem;   /*   20px */
+  --text-lg:   1.563rem;  /*  ~25px */
+  --text-xl:   1.953rem;  /*  ~31px */
+  --text-2xl:  2.441rem;  /*  ~39px */
+  --text-3xl:  3.052rem;  /*  ~49px */
+
+  /* --- Line heights --- */
+  --leading-tight:  1.2;
+  --leading-snug:   1.35;
+  --leading-normal: 1.6;
+  --leading-loose:  1.8;
+
+  /* --- Letter spacing --- */
+  --tracking-tight:  -0.02em;
+  --tracking-normal:  0;
+  --tracking-wide:    0.05em;
+  --tracking-wider:   0.1em;
+}
