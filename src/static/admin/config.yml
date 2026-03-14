@@ -3,8 +3,7 @@
 # The admin panel lives at: yourdomain.com/admin/
 
 backend:
-  name: github # or gitlab
-  repo: fijnbesnaard/fbeleventy
+  name: git-gateway
   branch: main
 
 # For local development: use the local backend proxy
