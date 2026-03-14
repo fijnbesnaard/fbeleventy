@@ -11,8 +11,11 @@ backend:
 # Run: npx @sveltia/cms-backend-proxy
 # local_backend: true
 
-media_folder: "src/static/images/uploads"
-public_folder: "/images/uploads"
+media_library:
+  name: cloudinary
+  config:
+    cloud_name: djkbyv665
+    api_key: 467429173567316
 
 # ── i18n ──────────────────────────────────────────────────────
 # Remove or simplify if the project is single-language
