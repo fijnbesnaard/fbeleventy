@@ -35,29 +35,12 @@ collections:
     slug: "{{slug}}"
     i18n: true
     fields:
-      - {
-          label: Layout,
-          name: layout,
-          widget: hidden,
-          default: layouts/page.njk,
-        }
+      - { label: Layout, name: layout, widget: hidden, default: layouts/page.njk }
       - { label: Titel, name: title, widget: string }
-      - {
-          label: Omschrijving,
-          name: description,
-          widget: string,
-          hint: "Voor SEO en Open Graph (max 160 tekens)",
-        }
+      - { label: Omschrijving, name: description, widget: string, hint: "Voor SEO en Open Graph (max 160 tekens)" }
       - { label: Inhoud, name: body, widget: markdown }
-      - label: OG Afbeelding
-        name: ogImage
-        widget: image
-        required: false
-      - label: Verberg van zoekmachines
-        name: noIndex
-        widget: boolean
-        default: false
-        required: false
+      - { label: OG Afbeelding, name: ogImage, widget: image, required: false }
+      - { label: Verberg van zoekmachines, name: noIndex, widget: boolean, default: false, required: false }
 
   # Blog posts
   - name: posts
@@ -68,39 +51,52 @@ collections:
     slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
     i18n: true
     fields:
-      - {
-          label: Layout,
-          name: layout,
-          widget: hidden,
-          default: layouts/post.njk,
-        }
+      - { label: Layout, name: layout, widget: hidden, default: layouts/post.njk }
       - { label: Titel, name: title, widget: string }
       - { label: Omschrijving, name: description, widget: string }
-      - {
-          label: Datum,
-          name: date,
-          widget: datetime,
-          date_format: YYYY-MM-DD,
-          time_format: false,
-        }
-      - label: Tags
-        name: tags
-        widget: list
-        default: [posts]
+      - { label: Datum, name: date, widget: datetime, date_format: YYYY-MM-DD, time_format: false }
+      - { label: Tags, name: tags, widget: list, default: [posts] }
       - { label: Inhoud, name: body, widget: markdown }
-      - label: OG Afbeelding
-        name: ogImage
-        widget: image
-        required: false
+      - { label: OG Afbeelding, name: ogImage, widget: image, required: false }
 
   # Site settings (singleton)
   - name: settings
     label: Instellingen
     files:
+      # General site info
       - label: Algemeen
         name: general
-        file: src/_data/site.js
+        file: src/_data/site.json
         fields:
           - { label: Sitenaam, name: title, widget: string }
           - { label: Omschrijving, name: description, widget: string }
-          - { label: URL, name: url, widget: string }
+          - { label: URL, name: url, widget: string, hint: "Zonder afsluitende slash, bijv. https://mijnsite.nl" }
+          - label: Auteur
+            name: author
+            widget: object
+            fields:
+              - { label: Naam, name: name, widget: string }
+              - { label: E-mailadres, name: email, widget: string }
+              - { label: Website, name: url, widget: string, required: false }
+          - label: Sociale media
+            name: social
+            widget: object
+            fields:
+              - { label: Instagram, name: instagram, widget: string, required: false, hint: "Volledig URL, bijv. https://instagram.com/account" }
+              - { label: LinkedIn,  name: linkedin,  widget: string, required: false }
+              - { label: Twitter/X, name: twitter,   widget: string, required: false }
+              - { label: Facebook,  name: facebook,  widget: string, required: false }
+              - { label: YouTube,   name: youtube,   widget: string, required: false }
+
+      # Navigation
+      - label: Navigatie
+        name: navigation
+        file: src/_data/nav.json
+        fields:
+          - label: Menu-items
+            name: ""
+            widget: list
+            label_singular: Menu-item
+            fields:
+              - { label: Label, name: label, widget: string, hint: "Tekst die zichtbaar is in het menu" }
+              - { label: URL,   name: url,   widget: string, hint: "Bijv. / of /over/ of https://extern.nl" }

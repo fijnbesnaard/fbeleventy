@@ -1,0 +1,38 @@
+---
+layout: layouts/base.njk
+title: Blog
+description: Alle berichten
+---
+
+{%- set t = i18n[locale | default(site.language)] -%}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+
+    <h1>{{ title }}</h1>
+
+    {% if collections.posts.length %}
+      <ul class="stack" role="list" style="list-style: none; padding: 0;">
+        {% for post in collections.posts %}
+          <li>
+            <article>
+              <a href="{{ post.url }}">
+                <h2 style="margin-bottom: var(--space-1)">{{ post.data.title }}</h2>
+              </a>
+              <p class="text-muted text-sm">
+                <time datetime="{{ post.date | dateISO }}">
+                  {{ t.post.publishedOn }} {{ post.date | dateDisplay }}
+                </time>
+              </p>
+            </article>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="text-muted">Er zijn nog geen berichten.</p>
+    {% endif %}
+
+  </div>
+</section>
+{% endblock %}
