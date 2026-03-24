@@ -94,7 +94,7 @@ collections:
         file: src/_data/nav.json
         fields:
           - label: Menu-items
-            name: ""
+            name: items
             widget: list
             label_singular: Menu-item
             fields:
