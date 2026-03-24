@@ -1,20 +1,20 @@
 {
-  "title":       "Site Title",
+  "title": "Site Title",
   "description": "Site description for SEO and Open Graph.",
-  "url":         "https://example.com",
-  "language":    "nl",
-  "locale":      "nl_NL",
-  "themeColor":  "#2979f5",
+  "url": "https://example.com",
   "author": {
-    "name":  "Studio Fijnbesnaard",
-    "email": "hallo@studiofijnbesnaard.nl",
-    "url":   "https://studiofijnbesnaard.nl"
+    "name": "Studio Fijnbesnaard",
+    "email": "niels@studiofijnbesnaard.nl",
+    "url": "https://studiofijnbesnaard.nl"
   },
   "social": {
     "instagram": "",
-    "linkedin":  "",
-    "twitter":   "",
-    "facebook":  "",
-    "youtube":   ""
-  }
+    "linkedin": "",
+    "twitter": "",
+    "facebook": "",
+    "youtube": ""
+  },
+  "locale": "nl_NL",
+  "language": "nl",
+  "themeColor": "#2979f5"
 }
