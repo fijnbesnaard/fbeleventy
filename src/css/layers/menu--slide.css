@@ -1,0 +1,140 @@
+/* ============================================================
+   MENU VARIANT: Slide In from Left
+   Loaded via <link> in base.njk when site.menuVariant = "slide".
+   This file is intentionally unlayered so it wins over header layer.
+   ============================================================ */
+
+:root {
+  --menu-duration: 0.5s;
+  --menu-ease:     cubic-bezier(0.77, 0, 0.175, 1);
+  --menu-bg:       #0d0d0d;
+}
+
+/* Reserve scrollbar space so overflow:hidden doesn't cause a layout jump */
+html {
+  scrollbar-gutter: stable;
+}
+
+/* Hamburger bars turn white when menu is open (dark panel visible behind) */
+.menu-toggle[aria-expanded="true"] span {
+  background: #fff;
+}
+
+/* ── Nav panel ─────────────────────────────────────────────── */
+
+.nav-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  width: 100vw;
+  min-height: 100vh;
+  background: var(--menu-bg);
+  color: #fff;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+
+  display: flex;
+  align-items: flex-start;
+  padding: 7rem 3rem 4rem;
+
+  /* Starts off-screen to the left */
+  transform: translateX(-100%);
+  transition: transform var(--menu-duration) var(--menu-ease);
+  will-change: transform;
+}
+
+.nav-overlay.is-open {
+  transform: translateX(0);
+}
+
+/* Visibility handled via aria-hidden so focus cannot reach a hidden menu */
+.nav-overlay[aria-hidden="true"] {
+  pointer-events: none;
+  visibility: hidden;
+  transition:
+    transform   var(--menu-duration) var(--menu-ease),
+    visibility  0s linear var(--menu-duration);
+}
+
+.nav-overlay[aria-hidden="false"] {
+  pointer-events: auto;
+  visibility: visible;
+  transition:
+    transform   var(--menu-duration) var(--menu-ease),
+    visibility  0s linear 0s;
+}
+
+/* ── Nav content ───────────────────────────────────────────── */
+
+.nav-inner {
+  width: 100%;
+  max-width: 640px;
+}
+
+.nav-overlay ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.nav-overlay a {
+  display: inline-block;
+  color: #fff;
+  text-decoration: none;
+  font-size: clamp(2.4rem, 7vw, 4.5rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  padding: 0.2em 0;
+  position: relative;
+  transition: color 0.2s;
+}
+
+/* Animated underline on hover */
+.nav-overlay a::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0.1em;
+  width: 0;
+  height: 3px;
+  background: #fff;
+  transition: width 0.3s var(--menu-ease);
+}
+
+.nav-overlay a:hover {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.nav-overlay a:hover::after {
+  width: 100%;
+}
+
+/* ── Footer links ──────────────────────────────────────────── */
+
+.nav-footer {
+  margin-top: 4rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.nav-footer a {
+  font-size: 0.9rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: rgba(255, 255, 255, 0.5);
+  line-height: 1.5;
+  padding: 0;
+}
+
+.nav-footer a:hover {
+  color: #fff;
+}
+
+.nav-footer a::after {
+  display: none;
+}

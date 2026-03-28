@@ -1,64 +1,15 @@
 /* ============================================================
-   COMPONENTS
-   One file per component. Import them here as the project grows.
+   COMPONENTS — aggregator
+   Import one file per component. Add components from the
+   studio-components catalog as needed for each project.
    Each component should only use semantic tokens — never raw
    color values or magic numbers.
-
-   Example structure as project grows:
-     @import "components/button.css";
-     @import "components/card.css";
-     @import "components/nav.css";
-     @import "components/hero.css";
    ============================================================ */
 
-/* --- Button (starter example) ---
-   Usage:
-     <button class="btn btn--primary">Label</button>
-     <button class="btn btn--ghost">Label</button>
-   ---------------------------------------------------------------- */
+@import "components/button.css";
 
-.btn {
-  display:          inline-flex;
-  align-items:      center;
-  gap:              var(--space-2);
-  padding:          var(--space-2) var(--space-6);
-  border-radius:    4px;
-  font-family:      var(--font-ui);
-  font-weight:      var(--weight-medium);
-  font-size:        var(--text-base);
-  text-decoration:  none;
-  white-space:      nowrap;
-  cursor:           pointer;
-  transition:       background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
-}
-
-.btn--primary {
-  background-color: var(--color-primary);
-  color:            var(--color-primary-text);
-  border:           2px solid transparent;
-}
-
-.btn--primary:hover {
-  background-color: var(--color-primary-hover);
-}
-
-.btn--ghost {
-  background-color: transparent;
-  color:            var(--color-primary);
-  border:           2px solid var(--color-primary);
-}
-
-.btn--ghost:hover {
-  background-color: var(--color-primary);
-  color:            var(--color-primary-text);
-}
-
-.btn--sm {
-  padding:   var(--space-1) var(--space-4);
-  font-size: var(--text-sm);
-}
-
-.btn--lg {
-  padding:   var(--space-3) var(--space-8);
-  font-size: var(--text-md);
-}
+/* Add project components below:
+@import "components/card.css";
+@import "components/hero.css";
+@import "components/testimonial.css";
+*/

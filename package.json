@@ -3,19 +3,19 @@
   "version": "1.0.0",
   "description": "Eleventy + Sveltia CMS starter template",
   "private": true,
+  "type": "module",
   "scripts": {
-    "start":  "npm run dev",
-    "dev":    "npm-run-all --parallel dev:*",
+    "start": "npm run dev",
+    "dev": "npm-run-all --parallel dev:*",
     "dev:11ty": "eleventy --serve",
-    "dev:css":  "postcss src/css/main.css --output public/css/main.css --watch",
-    "build":       "npm-run-all build:css build:11ty",
-    "build:css":   "NODE_ENV=production postcss src/css/main.css --output public/css/main.css",
-    "build:11ty":  "eleventy"
+    "dev:css": "postcss src/css/main.css --output public/css/main.css --watch",
+    "dev:cms": "npx @sveltia/cms-backend-proxy",
+    "build": "npm-run-all build:css build:11ty",
+    "build:css": "NODE_ENV=production postcss src/css/main.css --output public/css/main.css",
+    "build:11ty": "eleventy"
   },
-  "dependencies": {},
   "devDependencies": {
     "@11ty/eleventy": "^3.0.0",
-    "@11ty/eleventy-img": "^5.0.0",
     "@11ty/eleventy-plugin-rss": "^2.0.0",
     "autoprefixer": "^10.4.0",
     "cssnano": "^7.0.0",

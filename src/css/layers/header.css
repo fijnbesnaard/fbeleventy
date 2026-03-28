@@ -1,0 +1,242 @@
+/* ============================================================
+   HEADER
+   ============================================================
+
+   --menu-visible controls the min-width at which the desktop
+   nav is shown and the hamburger hidden. It is a reference
+   token only — CSS @media queries cannot read custom properties,
+   so you must also update the @media value at the bottom of
+   this file to match.
+
+   Default: 768px  ← change here AND in the @media below.
+   ============================================================ */
+
+:root {
+  --menu-visible: 7680px; /* ← also update the @media at the bottom */
+  --header-height: 64px;
+  --header-bg: var(--color-surface);
+  --header-border: var(--color-border);
+  --toggle-size: 48px;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ── Scroll lock ─────────────────────────────────────────── */
+
+body.menu-open {
+  overflow: hidden;
+}
+
+/* ── Header shell ────────────────────────────────────────── */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background-color: var(--header-bg);
+  border-bottom: 1px solid var(--header-border);
+}
+
+/* ── Optional topbar ─────────────────────────────────────── */
+
+.site-header__topbar {
+  background-color: var(--color-bg-subtle);
+  border-bottom: 1px solid var(--header-border);
+  padding-block: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+/* ── Main bar ────────────────────────────────────────────── */
+
+.site-header__main {
+  height: var(--header-height);
+  display: flex;
+  align-items: center;
+}
+
+.site-header__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+  gap: var(--space-6);
+}
+
+/* ── Logo ────────────────────────────────────────────────── */
+
+.site-header__logo {
+  flex-shrink: 0;
+  font-weight: var(--weight-bold);
+  text-decoration: none;
+  color: var(--color-text);
+}
+
+/* ── Desktop nav ─────────────────────────────────────────── */
+/* Hidden by default; shown via @media at the bottom          */
+
+.site-header__nav {
+  display: none;
+  flex: 1;
+}
+
+.site-header__nav ul {
+  display: flex;
+  gap: var(--space-6);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.site-header__nav a {
+  text-decoration: none;
+  color: var(--color-text);
+  font-size: var(--text-base);
+  transition: color 0.15s ease;
+}
+
+.site-header__nav a:hover {
+  color: var(--color-primary);
+}
+
+.site-header__nav a[aria-current="page"] {
+  color: var(--color-primary);
+  font-weight: var(--weight-medium);
+}
+
+/* ── Actions ─────────────────────────────────────────────── */
+
+.site-header__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-shrink: 0;
+  margin-right: calc(var(--toggle-size) + var(--space-3));
+}
+
+/* ── Theme toggle ────────────────────────────────────────── */
+
+.theme-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: var(--space-1);
+  color: var(--color-text);
+  font-size: var(--text-md);
+  line-height: 1;
+}
+
+.theme-toggle__icon--dark {
+  display: none;
+}
+
+[data-theme="dark"] .theme-toggle__icon--light {
+  display: none;
+}
+[data-theme="dark"] .theme-toggle__icon--dark {
+  display: inline;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .theme-toggle__icon--light {
+    display: none;
+  }
+  :root:not([data-theme="light"]) .theme-toggle__icon--dark {
+    display: inline;
+  }
+}
+
+/* ── Hamburger ───────────────────────────────────────────── */
+/*
+   Three <span> elements, each 2px tall with 5px gap.
+   Total rendered height: 16px. Middle axis: 8px.
+   Span 1 center is at 1px  → needs +7px to reach middle.
+   Span 3 center is at 15px → needs -7px to reach middle.
+*/
+
+/* ── Toggle button ────────────────────────────────── */
+.toggle-btn-container {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  z-index: 1000;
+  .container {
+    position: relative;
+  }
+}
+.menu-toggle {
+  position: absolute;
+  top: calc((var(--header-height) - var(--toggle-size)) / 2);
+  right: var(--gutter);
+  width: var(--toggle-size);
+  height: var(--toggle-size);
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  padding: 6px;
+  border-radius: 8px;
+}
+
+.menu-toggle span {
+  display: block;
+  width: 36px;
+  height: 3px;
+  background: #111;
+  border-radius: 2px;
+  transform-origin: center center;
+  transition:
+    transform 0.8s var(--ease-out),
+    opacity 0.8s var(--ease-out),
+    background 0.7s ease,
+    width 0.8s var(--ease-out);
+  will-change: transform, opacity;
+}
+
+/* Active: hamburger → cross */
+.menu-toggle.is-active span:nth-child(1) {
+  transform: translateY(9px) rotate(45deg);
+}
+
+.menu-toggle.is-active span:nth-child(2) {
+  opacity: 0;
+  width: 0;
+}
+
+.menu-toggle.is-active span:nth-child(3) {
+  transform: translateY(-9px) rotate(-45deg);
+}
+
+.menu-toggle.is-active span {
+  background: #fff;
+}
+
+/* ── Optional bottombar ──────────────────────────────────── */
+
+.site-header__bottombar {
+  border-top: 1px solid var(--header-border);
+  padding-block: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+/* ── Responsive breakpoint ───────────────────────────────── */
+/*
+   Keep this value in sync with --menu-visible above (768px).
+   At this width: show desktop nav, hide hamburger.
+*/
+
+@media (min-width: 7680px) {
+  .site-header__nav {
+    display: block;
+  }
+
+  .menu-toggle {
+    display: none;
+  }
+}

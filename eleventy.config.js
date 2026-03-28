@@ -1,10 +1,8 @@
 // eleventy.config.js
-import { feedPlugin }  from "@11ty/eleventy-plugin-rss";
-import { eleventyImageTransformPlugin } from "@11ty/eleventy-img";
+import { feedPlugin } from "@11ty/eleventy-plugin-rss";
 import { readFileSync } from "fs";
 
 export default function (eleventyConfig) {
-
   // ============================================================
   // PLUGINS
   // ============================================================
@@ -18,27 +16,14 @@ export default function (eleventyConfig) {
       limit: 20,
     },
     metadata: {
-      language: "nl",  // change per project
-      title:    "Site title",
+      language: "nl", // change per project
+      title: "Site title",
       subtitle: "Site description",
-      base:     "https://example.com/",
+      base: "https://example.com/",
       author: {
-        name:  "Author name",
+        name: "Author name",
         email: "author@example.com",
       },
-    },
-  });
-
-  // Automatic image optimisation
-  // Transforms <img> tags in output HTML — no template changes needed
-  eleventyConfig.addPlugin(eleventyImageTransformPlugin, {
-    extensions: "html",
-    formats: ["avif", "webp", "auto"],
-    widths: ["auto", 400, 800, 1200, 1600],
-    defaultAttributes: {
-      loading: "lazy",
-      decoding: "async",
-      sizes: "(min-width: 1024px) 1280px, 100vw",
     },
   });
 
@@ -49,7 +34,8 @@ export default function (eleventyConfig) {
 
   eleventyConfig.addPassthroughCopy("src/fonts");
   eleventyConfig.addPassthroughCopy("src/js");
-  eleventyConfig.addPassthroughCopy({ "src/static": "/" });  // robots.txt, favicon, etc.
+  eleventyConfig.addPassthroughCopy("src/css/layers/menu--*.css"); // menu variants — not bundled by PostCSS
+  eleventyConfig.addPassthroughCopy({ "src/static": "/" }); // robots.txt, favicon, etc.
 
   // ============================================================
   // WATCH TARGETS
@@ -66,9 +52,9 @@ export default function (eleventyConfig) {
   // Usage: {{ page.date | dateDisplay }}
   eleventyConfig.addFilter("dateDisplay", (date) => {
     return new Date(date).toLocaleDateString("nl-NL", {
-      year:  "numeric",
+      year: "numeric",
       month: "long",
-      day:   "numeric",
+      day: "numeric",
     });
   });
 
@@ -116,9 +102,7 @@ export default function (eleventyConfig) {
 
   // All posts, newest first
   eleventyConfig.addCollection("posts", (collection) => {
-    return collection
-      .getFilteredByGlob("src/content/posts/**/*.md")
-      .reverse();
+    return collection.getFilteredByGlob("src/content/posts/**/*.md").reverse();
   });
 
   // All pages
@@ -132,13 +116,13 @@ export default function (eleventyConfig) {
 
   return {
     dir: {
-      input:    "src",
-      output:   "public",
+      input: "src",
+      output: "public",
       includes: "_includes",
-      data:     "_data",
+      data: "_data",
     },
-    templateFormats:      ["njk", "md", "html"],
+    templateFormats: ["njk", "md", "html"],
     markdownTemplateEngine: "njk",
-    htmlTemplateEngine:    "njk",
+    htmlTemplateEngine: "njk",
   };
 }

@@ -1,7 +1,11 @@
 {
+  "menuVariant": "overlay",
   "title": "Site Title",
   "description": "Site description for SEO and Open Graph.",
   "url": "https://example.com",
+  "language": "nl",
+  "locale": "nl_NL",
+  "themeColor": "#2979f5",
   "author": {
     "name": "Studio Fijnbesnaard",
     "email": "niels@studiofijnbesnaard.nl",
@@ -13,8 +17,5 @@
     "twitter": "",
     "facebook": "",
     "youtube": ""
-  },
-  "locale": "nl_NL",
-  "language": "nl",
-  "themeColor": "#2979f5"
+  }
 }

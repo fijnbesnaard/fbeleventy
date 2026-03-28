@@ -7,31 +7,66 @@
 
 :root {
   /* --- Named container widths --- */
-  --width-narrow:  640px;   /* Long-form text, articles, forms */
-  --width-default: 960px;   /* Standard page content */
-  --width-wide:    1280px;  /* Broad layouts, dashboards, galleries */
+  --width-narrow: 640px; /* Long-form text, articles, forms */
+  --width-default: 960px; /* Standard page content */
+  --width-wide: 1280px; /* Broader layouts */
+  --width-ultrawide: 1620px; /* Broadest layouts, dashboards, galleries */
   /* full-width = no max-width constraint, edge to edge */
 
   /* --- Page gutter (horizontal padding on containers) --- */
-  --gutter: var(--space-4);       /* mobile: 16px */
+  --gutter: var(--space-4); /* mobile: 16px */
 
   /* --- Grid --- */
-  --grid-columns: 4;              /* mobile default */
-  --grid-gap:     var(--space-4);
+  --grid-columns: 4; /* mobile default */
+  --grid-gap: var(--space-4);
 }
 
 @media (min-width: 768px) {
   :root {
-    --gutter:       var(--space-8);  /* tablet: 32px */
+    --gutter: var(--space-8); /* tablet: 32px */
     --grid-columns: 8;
-    --grid-gap:     var(--space-6);
+    --grid-gap: var(--space-6);
   }
 }
 
 @media (min-width: 1024px) {
   :root {
-    --gutter:       var(--space-12); /* desktop: 48px */
+    --gutter: var(--space-12); /* desktop: 48px */
     --grid-columns: 12;
-    --grid-gap:     var(--space-8);
+    --grid-gap: var(--space-8);
   }
+}
+
+@media (min-width: 1280px) {
+  :root {
+    --gutter: var(--space-16); /* desktop: 64px */
+    /* --grid-columns: 12; */
+    /* --grid-gap: var(--space-8); */
+  }
+}
+
+/* ── Container ───────────────────────────────────────────────
+   Centers content and applies the responsive gutter.
+   Usage:
+     <div class="container">                default (960px)  </div>
+     <div class="container container--narrow">      640px    </div>
+     <div class="container container--wide">       1280px    </div>
+     No container = full bleed (background goes edge to edge)
+   ──────────────────────────────────────────────────────────── */
+
+.container {
+  width: 100%;
+  max-width: var(--width-default);
+  padding-inline: var(--gutter);
+  margin-inline: auto;
+}
+
+.container--narrow {
+  max-width: var(--width-narrow);
+}
+.container--wide {
+  max-width: var(--width-wide);
+}
+.container--ultrawide {
+  max-width: var(--width-ultrawide);
 }

@@ -1,6 +1,6 @@
 // src/js/main.js
-// Minimal JS — only what the base template needs.
-// Add feature-specific scripts as separate modules per project.
+// Shared utilities loaded on every page.
+// Menu open/close logic lives in the active menu variant module (js/menu--*.js).
 
 // ============================================================
 // THEME TOGGLE
@@ -15,26 +15,7 @@ window.toggleTheme = function () {
 };
 
 // ============================================================
-// MOBILE MENU
-// ============================================================
-
-window.toggleMenu = function (button) {
-  const menu      = document.getElementById("mobile-menu");
-  const isOpen    = button.getAttribute("aria-expanded") === "true";
-  const nextState = !isOpen;
-
-  button.setAttribute("aria-expanded", String(nextState));
-  menu.hidden      = !nextState;
-  menu.setAttribute("aria-hidden", String(!nextState));
-
-  // Swap aria-label
-  const site = document.querySelector("[data-site-language]");
-  // Labels are set inline in the template via data attributes if needed
-};
-
-// ============================================================
-// SKIP LINK — make it visible on focus (CSS handles most of this,
-// but we ensure #main receives focus correctly)
+// SKIP LINK
 // ============================================================
 
 document.addEventListener("DOMContentLoaded", () => {

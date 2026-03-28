@@ -1,0 +1,209 @@
+/* ============================================================
+   MENU VARIANT: Full-Screen Overlay with Stagger
+   Loaded via <link> in base.njk when site.menuVariant = "overlay".
+   This file is intentionally unlayered so it wins over header layer.
+   ============================================================ */
+
+:root {
+  --menu-duration-overlay: 0.45s;
+  --menu-duration-item:    0.4s;
+  --menu-ease-out:         cubic-bezier(0.16, 1, 0.3, 1);
+  --menu-accent:           #e8ff47;
+  --menu-bg:               #1a1a2e;
+}
+
+html {
+  scrollbar-gutter: stable;
+}
+
+/* Hamburger bars turn white when menu is open */
+.menu-toggle[aria-expanded="true"] span {
+  background: #fff;
+}
+
+/* ── Overlay container ─────────────────────────────────────── */
+/*
+  Two-layer approach:
+    1. .nav-overlay  — the full-screen container, fades in/out
+    2. ::before      — background panel that scales from 1.04 → 1 ("bloom")
+*/
+
+.nav-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  width: 100vw;
+  min-height: 100vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6rem 3rem 4rem;
+
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  transition:
+    opacity     var(--menu-duration-overlay) var(--menu-ease-out),
+    visibility  0s linear var(--menu-duration-overlay);
+}
+
+.nav-overlay.is-open {
+  opacity: 1;
+  pointer-events: auto;
+  visibility: visible;
+  transition:
+    opacity     var(--menu-duration-overlay) var(--menu-ease-out),
+    visibility  0s linear 0s;
+}
+
+/* Background panel — scales up from center for a subtle "bloom" */
+.nav-overlay::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: var(--menu-bg);
+  transform: scale(1.04);
+  transition: transform var(--menu-duration-overlay) var(--menu-ease-out);
+  z-index: -1;
+}
+
+.nav-overlay.is-open::before {
+  transform: scale(1);
+}
+
+/* ── Nav content ───────────────────────────────────────────── */
+
+.nav-inner {
+  width: 100%;
+  max-width: 900px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 3rem;
+}
+
+@media (min-width: 640px) {
+  .nav-inner {
+    grid-template-columns: 2fr 1fr;
+    align-items: start;
+  }
+}
+
+.nav-overlay ul {
+  list-style: none;
+}
+
+/* Overflow hidden on each <li> masks the slide-up entrance */
+.nav-overlay ul li {
+  overflow: hidden;
+}
+
+/*
+  Primary links: start below, invisible.
+  .is-open triggers staggered entrance via nth-child delays.
+*/
+.nav-overlay a.primary-link {
+  display: block;
+  color: #fff;
+  text-decoration: none;
+  font-size: clamp(2.2rem, 6vw, 4rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  padding: 0.3em 0;
+  transform: translateY(110%);
+  opacity: 0;
+  transition:
+    transform var(--menu-duration-item) var(--menu-ease-out),
+    opacity   var(--menu-duration-item) var(--menu-ease-out),
+    color 0.2s ease;
+}
+
+.nav-overlay.is-open a.primary-link {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* Stagger delays */
+.nav-overlay ul li:nth-child(1) a { transition-delay: 0.05s; }
+.nav-overlay ul li:nth-child(2) a { transition-delay: 0.1s;  }
+.nav-overlay ul li:nth-child(3) a { transition-delay: 0.15s; }
+.nav-overlay ul li:nth-child(4) a { transition-delay: 0.2s;  }
+.nav-overlay ul li:nth-child(5) a { transition-delay: 0.25s; }
+.nav-overlay ul li:nth-child(6) a { transition-delay: 0.3s;  }
+
+.nav-overlay a.primary-link:hover {
+  color: var(--menu-accent);
+}
+
+/* ── Accent line ───────────────────────────────────────────── */
+
+.nav-accent {
+  width: 0;
+  height: 3px;
+  background: var(--menu-accent);
+  border-radius: 2px;
+  margin-bottom: 2rem;
+  transition: width 0.5s var(--menu-ease-out) 0.1s;
+}
+
+.nav-overlay.is-open .nav-accent {
+  width: 60px;
+}
+
+/* ── Side column ───────────────────────────────────────────── */
+
+.nav-side {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  transform: translateY(20px);
+  opacity: 0;
+  transition:
+    transform var(--menu-duration-item) var(--menu-ease-out) 0.3s,
+    opacity   var(--menu-duration-item) var(--menu-ease-out) 0.3s;
+}
+
+.nav-overlay.is-open .nav-side {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.nav-side h2 {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.35);
+  margin-bottom: 0.75rem;
+}
+
+.nav-side ul {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.nav-side a {
+  color: rgba(255, 255, 255, 0.6);
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 400;
+  display: block;
+  transition: color 0.2s;
+  /* Reset stagger and entrance transform for side links */
+  transform: none;
+  opacity: 1;
+  transition-delay: 0s;
+}
+
+.nav-side a:hover {
+  color: #fff;
+}
+
+/* Override nth-child stagger for side column links */
+.nav-side ul li:nth-child(n) a {
+  transition-delay: 0s;
+}

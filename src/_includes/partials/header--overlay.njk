@@ -1,0 +1,107 @@
+{#- ============================================================
+    MENU VARIANT: Full-Screen Overlay with Stagger
+    Overlay fades in; nav items slide up with staggered delays.
+    Switch via site.menuVariant = "overlay" in src/_data/site.json.
+    ============================================================ #}
+
+{%- set t = i18n[locale | default(site.language)] -%}
+
+<header class="site-header">
+
+  <div class="site-header__main">
+    <div class="container container--ultrawide">
+      <div class="site-header__inner">
+
+        <a href="/" class="site-header__logo" aria-label="{{ site.title }}">
+          {{ site.title }}
+        </a>
+
+        <nav class="site-header__nav" aria-label="Hoofdnavigatie">
+          <ul role="list">
+            {% for item in nav.items %}
+              <li>
+                <a href="{{ item.url }}"
+                   {% if page.url === item.url %}aria-current="page"{% endif %}>
+                  {{ item.label }}
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+        </nav>
+
+        <div class="site-header__actions">
+
+          <button class="theme-toggle"
+                  aria-label="{{ t.aria.toggleTheme }}"
+                  onclick="toggleTheme()">
+            <span class="theme-toggle__icon theme-toggle__icon--light">☀️</span>
+            <span class="theme-toggle__icon theme-toggle__icon--dark">🌙</span>
+          </button>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+
+{# Toggle button — outside <header> so its z-index isn't capped by the header's stacking context #}
+<div class="toggle-btn-container">
+
+  <div class="container container--ultrawide">
+    <button class="menu-toggle"
+      id="menu-toggle"
+      aria-label="{{ t.aria.openMenu }}"
+      aria-expanded="false"
+      aria-controls="nav-overlay">
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+    </button>
+  </div>
+</div>
+
+{# Full-screen overlay nav with staggered entrance #}
+<nav id="nav-overlay"
+     class="nav-overlay"
+     aria-hidden="true"
+     aria-label="{{ t.aria.openMenu }}">
+  <div class="nav-inner">
+
+    {# Primary nav — big staggered links #}
+    <div>
+      <div class="nav-accent"></div>
+      <ul>
+        {% for item in nav.items %}
+          <li>
+            <a href="{{ item.url }}"
+               class="primary-link"
+               {% if page.url === item.url %}aria-current="page"{% endif %}>
+              {{ item.label }}
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    {# Side column — uncomment and populate as needed
+    <div class="nav-side">
+      <div>
+        <h2>Connect</h2>
+        <ul>
+          <li><a href="#">Instagram</a></li>
+          <li><a href="#">LinkedIn</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>Legal</h2>
+        <ul>
+          <li><a href="/privacy">Privacy</a></li>
+          <li><a href="/terms">Terms</a></li>
+        </ul>
+      </div>
+    </div>
+    #}
+
+  </div>
+</nav>

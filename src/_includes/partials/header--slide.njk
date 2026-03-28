@@ -1,0 +1,86 @@
+{#- ============================================================
+    MENU VARIANT: Slide In from Left
+    Nav panel slides in from the left over the full viewport.
+    Switch via site.menuVariant = "slide" in src/_data/site.json.
+    ============================================================ #}
+
+{%- set t = i18n[locale | default(site.language)] -%}
+
+<header class="site-header">
+
+  <div class="site-header__main">
+    <div class="container container--wide">
+      <div class="site-header__inner">
+
+        <a href="/" class="site-header__logo" aria-label="{{ site.title }}">
+          {{ site.title }}
+        </a>
+
+        <nav class="site-header__nav" aria-label="Hoofdnavigatie">
+          <ul role="list">
+            {% for item in nav.items %}
+              <li>
+                <a href="{{ item.url }}"
+                   {% if page.url === item.url %}aria-current="page"{% endif %}>
+                  {{ item.label }}
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+        </nav>
+
+        <div class="site-header__actions">
+
+          <button class="theme-toggle"
+                  aria-label="{{ t.aria.toggleTheme }}"
+                  onclick="toggleTheme()">
+            <span class="theme-toggle__icon theme-toggle__icon--light">☀️</span>
+            <span class="theme-toggle__icon theme-toggle__icon--dark">🌙</span>
+          </button>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+
+{# Toggle button — outside <header> so its z-index isn't capped by the header's stacking context #}
+<div class="toggle-btn-container">
+  <div class="container container--wide">
+    <button class="menu-toggle"
+            id="menu-toggle"
+            aria-label="{{ t.aria.openMenu }}"
+            aria-expanded="false"
+            aria-controls="nav-overlay">
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+    </button>
+  </div>
+</div>
+
+{# Full-viewport slide-in nav panel #}
+<nav id="nav-overlay"
+     class="nav-overlay"
+     aria-hidden="true"
+     aria-label="{{ t.aria.openMenu }}">
+  <div class="nav-inner">
+    <ul>
+      {% for item in nav.items %}
+        <li>
+          <a href="{{ item.url }}"
+             {% if page.url === item.url %}aria-current="page"{% endif %}>
+            {{ item.label }}
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+
+    {# Footer links — populate from data as needed #}
+    {# <div class="nav-footer">
+      <a href="/privacy">Privacy</a>
+      <a href="/terms">Terms</a>
+    </div> #}
+  </div>
+</nav>

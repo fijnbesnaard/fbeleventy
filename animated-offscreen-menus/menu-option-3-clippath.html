@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Option 3 — Clip-Path Circular Reveal</title>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --duration: 0.65s;
+      --ease: cubic-bezier(0.77, 0, 0.175, 1);
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      --menu-bg: #ff4d1c;
+      --toggle-top: 1.25rem;
+      --toggle-right: 1.5rem;
+      --toggle-size: 48px;
+      /* Approximate pixel center of the toggle button for clip-path origin.
+         Updated by JS on resize so it always originates from the button. */
+      --origin-x: calc(100vw - 1.5rem - 24px);
+      --origin-y: calc(1.25rem + 24px);
+    }
+
+    html {
+      scrollbar-gutter: stable;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      line-height: 1.6;
+      color: #1a1a1a;
+      background: #f0ede8;
+    }
+
+    body.menu-open {
+      overflow: hidden;
+    }
+
+    /* ── Page content ─────────────────────────────────── */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: #f0ede8;
+      border-bottom: 1px solid #dedad4;
+      padding: 1rem 2rem;
+    }
+
+    .logo {
+      font-weight: 700;
+      font-size: 1.1rem;
+      letter-spacing: -0.02em;
+    }
+
+    .page-main {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 4rem 2rem;
+    }
+
+    .page-main h1 {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 1.5rem;
+    }
+
+    .page-main p {
+      font-size: 1.1rem;
+      color: #555;
+      margin-bottom: 1rem;
+      max-width: 60ch;
+    }
+
+    .demo-block {
+      margin-top: 3rem;
+      padding: 2rem;
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid #e0ddd8;
+    }
+
+    /* ── Toggle button ────────────────────────────────── */
+    /*
+      The button is positioned at top-right and sits ABOVE the nav (z-index 1000).
+      Its center point is the origin of the clip-path circle.
+    */
+    .menu-toggle {
+      position: fixed;
+      top: var(--toggle-top);
+      right: var(--toggle-right);
+      z-index: 1000;
+      width: var(--toggle-size);
+      height: var(--toggle-size);
+      background: #1a1a1a;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 5px;
+      padding: 6px;
+      border-radius: 50%;
+      transition: background 0.3s ease, transform 0.3s var(--ease-out);
+    }
+
+    .menu-toggle:hover {
+      transform: scale(1.08);
+    }
+
+    .menu-toggle span {
+      display: block;
+      height: 2px;
+      background: #fff;
+      border-radius: 2px;
+      transform-origin: center center;
+      transition:
+        transform var(--duration) var(--ease),
+        opacity   var(--duration) var(--ease),
+        width     var(--duration) var(--ease);
+      will-change: transform, opacity;
+    }
+
+    /* Variable widths give the hamburger a staircase look */
+    .menu-toggle span:nth-child(1) { width: 20px; }
+    .menu-toggle span:nth-child(2) { width: 14px; }
+    .menu-toggle span:nth-child(3) { width: 20px; }
+
+    /* Active: hamburger → ✕ (all same width for the cross) */
+    .menu-toggle.is-active span:nth-child(1) {
+      width: 20px;
+      transform: translateY(7px) rotate(45deg);
+    }
+
+    .menu-toggle.is-active span:nth-child(2) {
+      opacity: 0;
+      width: 0;
+    }
+
+    .menu-toggle.is-active span:nth-child(3) {
+      width: 20px;
+      transform: translateY(-7px) rotate(-45deg);
+    }
+
+    .menu-toggle.is-active {
+      background: #fff;
+    }
+
+    .menu-toggle.is-active span {
+      background: var(--menu-bg);
+    }
+
+    /* ── Off-screen nav — clip-path reveal ────────────── */
+    /*
+      clip-path: circle() grows from the toggle button's center.
+      A circle that covers the full viewport diagonal needs radius ≈ 150vmax.
+
+      The origin coordinates are set via CSS custom properties and updated
+      by JS on resize so the circle always starts from the button center.
+    */
+    .nav-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      width: 100vw;
+      min-height: 100vh;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      background: var(--menu-bg);
+      color: #fff;
+
+      display: flex;
+      align-items: flex-start;
+      padding: 7rem 3rem 4rem;
+
+      /* Closed: a tiny circle at the button center */
+      clip-path: circle(0% at var(--origin-x) var(--origin-y));
+      transition: clip-path var(--duration) var(--ease);
+      will-change: clip-path;
+
+      pointer-events: none;
+      visibility: hidden;
+    }
+
+    .nav-overlay[aria-hidden="false"] {
+      /* Open: expand circle to cover everything */
+      clip-path: circle(150% at var(--origin-x) var(--origin-y));
+      pointer-events: auto;
+      visibility: visible;
+      transition:
+        clip-path var(--duration) var(--ease),
+        visibility 0s linear 0s;
+    }
+
+    .nav-overlay[aria-hidden="true"] {
+      transition:
+        clip-path var(--duration) var(--ease),
+        visibility 0s linear var(--duration);
+    }
+
+    /* ── Nav content ──────────────────────────────────── */
+    .nav-inner {
+      width: 100%;
+      max-width: 700px;
+    }
+
+    .nav-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 2.5rem;
+    }
+
+    .nav-overlay ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    /* Each item has an overflow:hidden wrapper so the link can slide up */
+    .nav-overlay ul li {
+      overflow: hidden;
+      border-top: 1px solid rgba(255,255,255,0.15);
+    }
+
+    .nav-overlay ul li:last-child {
+      border-bottom: 1px solid rgba(255,255,255,0.15);
+    }
+
+    .nav-overlay a {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #fff;
+      text-decoration: none;
+      font-size: clamp(1.6rem, 5vw, 3rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      padding: 0.5em 0;
+      transform: translateY(120%);
+      opacity: 0;
+      transition:
+        transform 0.5s var(--ease-out),
+        opacity   0.5s var(--ease-out),
+        color 0.2s ease;
+    }
+
+    .nav-overlay[aria-hidden="false"] a {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* Stagger */
+    .nav-overlay ul li:nth-child(1) a { transition-delay: 0.1s; }
+    .nav-overlay ul li:nth-child(2) a { transition-delay: 0.15s; }
+    .nav-overlay ul li:nth-child(3) a { transition-delay: 0.2s; }
+    .nav-overlay ul li:nth-child(4) a { transition-delay: 0.25s; }
+    .nav-overlay ul li:nth-child(5) a { transition-delay: 0.3s; }
+    .nav-overlay ul li:nth-child(6) a { transition-delay: 0.35s; }
+
+    /* Reset delay on close so items disappear quickly */
+    .nav-overlay[aria-hidden="true"] a {
+      transition-delay: 0s !important;
+    }
+
+    .nav-overlay a:hover {
+      color: rgba(255,255,255,0.6);
+    }
+
+    /* Arrow glyph next to each link */
+    .nav-overlay a .arrow {
+      font-size: 1.2rem;
+      font-weight: 300;
+      opacity: 0;
+      transform: translateX(-8px);
+      transition: opacity 0.2s, transform 0.2s;
+    }
+
+    .nav-overlay a:hover .arrow {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    /* ── Footer links ─────────────────────────────────── */
+    .nav-footer {
+      margin-top: 3rem;
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      transform: translateY(20px);
+      opacity: 0;
+      transition:
+        transform 0.4s var(--ease-out) 0.4s,
+        opacity   0.4s var(--ease-out) 0.4s;
+    }
+
+    .nav-overlay[aria-hidden="false"] .nav-footer {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .nav-overlay[aria-hidden="true"] .nav-footer {
+      transition-delay: 0s;
+    }
+
+    .nav-footer a {
+      font-size: 0.85rem !important;
+      font-weight: 400 !important;
+      letter-spacing: 0 !important;
+      color: rgba(255,255,255,0.5) !important;
+      padding: 0 !important;
+      transform: none !important;
+      opacity: 1 !important;
+      transition: color 0.2s !important;
+      transition-delay: 0s !important;
+    }
+
+    .nav-footer a:hover {
+      color: #fff !important;
+    }
+
+    .nav-footer a .arrow {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Toggle button — at z-index 1000, always on top -->
+  <button
+    class="menu-toggle"
+    id="menuToggle"
+    aria-label="Open menu"
+    aria-expanded="false"
+    aria-controls="navOverlay"
+  >
+    <span aria-hidden="true"></span>
+    <span aria-hidden="true"></span>
+    <span aria-hidden="true"></span>
+  </button>
+
+  <!-- Off-screen nav with clip-path reveal -->
+  <nav
+    class="nav-overlay"
+    id="navOverlay"
+    aria-hidden="true"
+    aria-label="Main navigation"
+  >
+    <div class="nav-inner">
+      <p class="nav-label">Navigation</p>
+      <ul>
+        <li><a href="#"><span>Home</span><span class="arrow">→</span></a></li>
+        <li><a href="#"><span>About</span><span class="arrow">→</span></a></li>
+        <li><a href="#"><span>Work</span><span class="arrow">→</span></a></li>
+        <li><a href="#"><span>Services</span><span class="arrow">→</span></a></li>
+        <li><a href="#"><span>Journal</span><span class="arrow">→</span></a></li>
+        <li><a href="#"><span>Contact</span><span class="arrow">→</span></a></li>
+      </ul>
+      <div class="nav-footer">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Accessibility</a>
+        <a href="#">© 2026</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Page content -->
+  <header class="site-header">
+    <span class="logo">Studio&nbsp;Name</span>
+  </header>
+
+  <main class="page-main">
+    <h1>Clip-Path Circular Reveal</h1>
+    <p>
+      The menu reveals via <code>clip-path: circle()</code>, expanding from
+      the exact center of the toggle button. The origin coordinates are
+      calculated from the button's bounding rect so it always lines up
+      perfectly, even after a window resize.
+    </p>
+    <p>
+      Browser support for <code>clip-path</code> circle animations is
+      excellent across all modern browsers. The effect is GPU-composited
+      and performs well even on mobile.
+    </p>
+    <div class="demo-block">
+      <p>Open the menu — the circle expands outward from the button.</p>
+      <br>
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+      <br>
+      <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+      <br>
+      <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt.</p>
+      <br>
+      <p>At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident.</p>
+      <br>
+      <p>Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus, omnis voluptas assumenda est, omnis dolor repellendus.</p>
+    </div>
+  </main>
+
+  <script>
+    (() => {
+      const toggle = document.getElementById('menuToggle');
+      const overlay = document.getElementById('navOverlay');
+      let isOpen = false;
+
+      // Keep clip-path origin locked to button center, even on resize
+      function updateOrigin() {
+        const rect = toggle.getBoundingClientRect();
+        const cx = Math.round(rect.left + rect.width / 2);
+        const cy = Math.round(rect.top  + rect.height / 2);
+        document.documentElement.style.setProperty('--origin-x', cx + 'px');
+        document.documentElement.style.setProperty('--origin-y', cy + 'px');
+      }
+
+      updateOrigin();
+      window.addEventListener('resize', updateOrigin, { passive: true });
+
+      function getScrollbarWidth() {
+        return window.innerWidth - document.documentElement.clientWidth;
+      }
+
+      const supportsScrollbarGutter = CSS.supports('scrollbar-gutter', 'stable');
+
+      function openMenu() {
+        updateOrigin(); // recalculate in case viewport changed
+        if (!supportsScrollbarGutter) {
+          const sw = getScrollbarWidth();
+          document.body.style.paddingRight = sw + 'px';
+          toggle.style.right = (1.5 * 16 + sw) + 'px';
+        }
+        document.body.classList.add('menu-open');
+        toggle.classList.add('is-active');
+        overlay.setAttribute('aria-hidden', 'false');
+        toggle.setAttribute('aria-expanded', 'true');
+        toggle.setAttribute('aria-label', 'Close menu');
+        isOpen = true;
+        const firstLink = overlay.querySelector('a');
+        if (firstLink) setTimeout(() => firstLink.focus(), 100); // after transition starts
+      }
+
+      function closeMenu() {
+        document.body.classList.remove('menu-open');
+        if (!supportsScrollbarGutter) {
+          document.body.style.paddingRight = '';
+          toggle.style.right = '';
+        }
+        toggle.classList.remove('is-active');
+        overlay.setAttribute('aria-hidden', 'true');
+        toggle.setAttribute('aria-expanded', 'false');
+        toggle.setAttribute('aria-label', 'Open menu');
+        isOpen = false;
+        toggle.focus();
+      }
+
+      toggle.addEventListener('click', () => {
+        isOpen ? closeMenu() : openMenu();
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && isOpen) closeMenu();
+      });
+
+      overlay.querySelectorAll('ul a').forEach(link => {
+        link.addEventListener('click', closeMenu);
+      });
+    })();
+  </script>
+</body>
+</html>

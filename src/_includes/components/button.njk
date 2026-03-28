@@ -1,0 +1,35 @@
+{#- ============================================================
+    COMPONENT MACRO: button
+    ============================================================
+
+    Parameters:
+      label    (string, required)  — button text
+      url      (string)            — renders as <a> when set, <button> otherwise
+      variant  (string)            — "primary" (default) | "ghost"
+      size     (string)            — "sm" | "md" (default) | "lg"
+      type     (string)            — button type attribute, default "button"
+      attrs    (string)            — any extra HTML attributes
+
+    Usage:
+      {% from "components/button.njk" import button %}
+
+      {{ button({ label: "Contact", url: "/contact/", variant: "primary" }) }}
+      {{ button({ label: "Send", variant: "ghost", size: "lg" }) }}
+      {{ button({ label: "Delete", attrs: 'onclick="confirm()"' }) }}
+    ============================================================ #}
+
+{% macro button(props) %}
+  {%- set variant = props.variant | default("primary") -%}
+  {%- set size    = props.size    | default("md") -%}
+  {%- set classes = "btn btn--" + variant + (" btn--" + size if size !== "md" else "") -%}
+
+  {%- if props.url %}
+    <a href="{{ props.url }}" class="{{ classes }}"{{ (" " + props.attrs) | safe if props.attrs }}>
+      {{ props.label }}
+    </a>
+  {%- else %}
+    <button type="{{ props.type | default('button') }}" class="{{ classes }}"{{ (" " + props.attrs) | safe if props.attrs }}>
+      {{ props.label }}
+    </button>
+  {%- endif %}
+{% endmacro %}

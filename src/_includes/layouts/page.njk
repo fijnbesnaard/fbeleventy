@@ -7,11 +7,6 @@
 
 {% block content %}
   <article class="section">
-    <div class="container">
-      {% if title %}
-        <h1>{{ title }}</h1>
-      {% endif %}
-      {{ content | safe }}
-    </div>
+    {{ content | safe }}
   </article>
 {% endblock %}

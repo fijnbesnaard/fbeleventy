@@ -1,0 +1,232 @@
+/* ============================================================
+   MENU VARIANT: Clip-Path Circular Reveal
+   Loaded via <link> in base.njk when site.menuVariant = "clippath".
+   This file is intentionally unlayered so it wins over header layer.
+   ============================================================ */
+
+:root {
+  --menu-duration: 0.65s;
+  --menu-ease:     cubic-bezier(0.77, 0, 0.175, 1);
+  --menu-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --menu-bg:       #ff4d1c;
+
+  /* Clip-path origin — updated by JS on load and resize */
+  --origin-x: calc(100vw - 1.5rem - 24px);
+  --origin-y: calc(1.25rem + 24px);
+}
+
+html {
+  scrollbar-gutter: stable;
+}
+
+/* ── Toggle button — circular, dark background, white bars ── */
+
+.menu-toggle {
+  background: #1a1a1a;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  gap: 5px;
+  transition: background 0.3s ease, transform 0.3s var(--menu-ease-out);
+}
+
+.menu-toggle:hover {
+  transform: scale(1.08);
+}
+
+/* Staircase bar widths */
+.menu-toggle span {
+  background: #fff;
+}
+
+.menu-toggle span:nth-child(1) { width: 20px; }
+.menu-toggle span:nth-child(2) { width: 14px; }
+.menu-toggle span:nth-child(3) { width: 20px; }
+
+/* Cross state — bars return to same width for a symmetrical X */
+.menu-toggle[aria-expanded="true"] span:nth-child(1) {
+  width: 20px;
+}
+
+.menu-toggle[aria-expanded="true"] span:nth-child(3) {
+  width: 20px;
+}
+
+.menu-toggle[aria-expanded="true"] {
+  background: #fff;
+}
+
+.menu-toggle[aria-expanded="true"] span {
+  background: var(--menu-bg);
+}
+
+/* ── Nav overlay — clip-path circle expands from toggle center ─ */
+
+.nav-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  width: 100vw;
+  min-height: 100vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  background: var(--menu-bg);
+  color: #fff;
+
+  display: flex;
+  align-items: flex-start;
+  padding: 7rem 3rem 4rem;
+
+  /* Closed: a tiny circle at the button center */
+  clip-path: circle(0% at var(--origin-x) var(--origin-y));
+  transition: clip-path var(--menu-duration) var(--menu-ease);
+  will-change: clip-path;
+
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.nav-overlay[aria-hidden="false"] {
+  /* Open: expand to cover the full viewport */
+  clip-path: circle(150% at var(--origin-x) var(--origin-y));
+  pointer-events: auto;
+  visibility: visible;
+  transition:
+    clip-path   var(--menu-duration) var(--menu-ease),
+    visibility  0s linear 0s;
+}
+
+.nav-overlay[aria-hidden="true"] {
+  transition:
+    clip-path   var(--menu-duration) var(--menu-ease),
+    visibility  0s linear var(--menu-duration);
+}
+
+/* ── Nav content ───────────────────────────────────────────── */
+
+.nav-inner {
+  width: 100%;
+  max-width: 700px;
+}
+
+.nav-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 2.5rem;
+}
+
+.nav-overlay ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* Overflow hidden on each <li> masks the slide-up entrance */
+.nav-overlay ul li {
+  overflow: hidden;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.nav-overlay ul li:last-child {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.nav-overlay a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #fff;
+  text-decoration: none;
+  font-size: clamp(1.6rem, 5vw, 3rem);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  padding: 0.5em 0;
+  transform: translateY(120%);
+  opacity: 0;
+  transition:
+    transform 0.5s var(--menu-ease-out),
+    opacity   0.5s var(--menu-ease-out),
+    color 0.2s ease;
+}
+
+.nav-overlay[aria-hidden="false"] a {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* Stagger delays */
+.nav-overlay ul li:nth-child(1) a { transition-delay: 0.1s;  }
+.nav-overlay ul li:nth-child(2) a { transition-delay: 0.15s; }
+.nav-overlay ul li:nth-child(3) a { transition-delay: 0.2s;  }
+.nav-overlay ul li:nth-child(4) a { transition-delay: 0.25s; }
+.nav-overlay ul li:nth-child(5) a { transition-delay: 0.3s;  }
+.nav-overlay ul li:nth-child(6) a { transition-delay: 0.35s; }
+
+/* Reset delay on close so items disappear immediately with the circle */
+.nav-overlay[aria-hidden="true"] a {
+  transition-delay: 0s;
+}
+
+.nav-overlay a:hover {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* ── Arrow glyph ───────────────────────────────────────────── */
+
+.nav-overlay a .arrow {
+  font-size: 1.2rem;
+  font-weight: 300;
+  opacity: 0;
+  transform: translateX(-8px);
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.nav-overlay a:hover .arrow {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* ── Footer links ──────────────────────────────────────────── */
+
+.nav-footer {
+  margin-top: 3rem;
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  transform: translateY(20px);
+  opacity: 0;
+  transition:
+    transform 0.4s var(--menu-ease-out) 0.4s,
+    opacity   0.4s var(--menu-ease-out) 0.4s;
+}
+
+.nav-overlay[aria-hidden="false"] .nav-footer {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.nav-overlay[aria-hidden="true"] .nav-footer {
+  transition-delay: 0s;
+}
+
+.nav-footer a {
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.5);
+  transform: none;
+  opacity: 1;
+  transition: color 0.2s;
+  transition-delay: 0s;
+}
+
+.nav-footer a:hover {
+  color: #fff;
+}
+
+.nav-footer a .arrow {
+  display: none;
+}

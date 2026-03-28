@@ -28,28 +28,46 @@
 
 /* --- Document --- */
 html {
-  color:            var(--color-text);
+  color: var(--color-text);
   background-color: var(--color-bg);
-  font-family:      var(--font-body);
-  font-size:        var(--text-base);
-  font-weight:      var(--weight-regular);
-  line-height:      var(--leading-normal);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-normal);
 }
 
 /* --- Headings --- */
-h1, h2, h3, h4, h5, h6 {
-  font-family:  var(--font-heading);
-  font-weight:  var(--weight-bold);
-  line-height:  var(--leading-tight);
-  color:        var(--color-text);
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-tight);
+  color: var(--color-text);
 }
 
-h1 { font-size: var(--text-3xl); }
-h2 { font-size: var(--text-2xl); }
-h3 { font-size: var(--text-xl);  }
-h4 { font-size: var(--text-lg);  }
-h5 { font-size: var(--text-md);  }
-h6 { font-size: var(--text-base); font-weight: var(--weight-semibold); }
+h1 {
+  font-size: var(--text-3xl);
+}
+h2 {
+  font-size: var(--text-2xl);
+}
+h3 {
+  font-size: var(--text-xl);
+}
+h4 {
+  font-size: var(--text-lg);
+}
+h5 {
+  font-size: var(--text-md);
+}
+h6 {
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+}
 
 /* --- Body copy --- */
 p {
@@ -58,9 +76,9 @@ p {
 
 /* --- Links --- */
 a {
-  color:           var(--color-link);
+  color: var(--color-link);
   text-decoration: underline;
-  transition:      color 0.15s ease;
+  transition: color 0.15s ease;
 }
 
 a:hover {
@@ -68,26 +86,30 @@ a:hover {
 }
 
 /* --- Lists --- */
-ul, ol {
+ul,
+ol {
   padding-inline-start: var(--space-6);
 }
 
-li + li {
+/* li + li {
   margin-block-start: var(--space-1);
-}
+} */
 
 /* --- Code --- */
-code, kbd, samp, pre {
+code,
+kbd,
+samp,
+pre {
   font-family: var(--font-mono);
-  font-size:   0.9em;
+  font-size: 0.9em;
 }
 
 pre {
-  overflow-x:    auto;
-  padding:       var(--space-4);
+  overflow-x: auto;
+  padding: var(--space-4);
   border-radius: 4px;
-  background:    var(--color-bg-muted);
-  border:        1px solid var(--color-border);
+  background: var(--color-bg-muted);
+  border: 1px solid var(--color-border);
 }
 
 /* --- Blockquote --- */
@@ -110,44 +132,52 @@ table {
   font-size: var(--text-sm);
 }
 
-th, td {
+th,
+td {
   text-align: left;
   padding: var(--space-2) var(--space-4);
   border-bottom: 1px solid var(--color-border);
 }
 
 th {
-  font-weight:      var(--weight-semibold);
-  color:            var(--color-text-muted);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-muted);
   background-color: var(--color-bg-subtle);
 }
 
 /* --- Form elements (basic) --- */
 label {
   font-weight: var(--weight-medium);
-  font-size:   var(--text-sm);
+  font-size: var(--text-sm);
 }
 
-input, textarea, select {
-  width:            100%;
-  padding:          var(--space-2) var(--space-3);
-  border:           1px solid var(--color-border);
-  border-radius:    4px;
+input,
+textarea,
+select {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
   background-color: var(--color-surface);
-  color:            var(--color-text);
-  font-size:        var(--text-base);
-  transition:       border-color 0.15s ease, box-shadow 0.15s ease;
+  color: var(--color-text);
+  font-size: var(--text-base);
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
-input:focus, textarea:focus, select:focus {
-  outline:      none;
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
   border-color: var(--color-primary);
-  box-shadow:   0 0 0 3px color-mix(in srgb, var(--color-primary) 20%, transparent);
+  box-shadow: 0 0 0 3px
+    color-mix(in srgb, var(--color-primary) 20%, transparent);
 }
 
 /* --- Focus visible (keyboard nav) --- */
 :focus-visible {
-  outline:        2px solid var(--color-primary);
+  outline: 2px solid var(--color-primary);
   outline-offset: 3px;
-  border-radius:  2px;
+  border-radius: 2px;
 }

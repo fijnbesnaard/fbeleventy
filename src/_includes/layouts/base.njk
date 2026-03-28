@@ -62,6 +62,7 @@
 
   {# ── CSS ── #}
   <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/layers/menu--{{ site.menuVariant }}.css">
 
   {# ── Per-page head additions ── #}
   {% block head %}{% endblock %}
@@ -74,8 +75,9 @@
     {{ t.aria.skipToMain }}
   </a>
 
-  {# ── Site header ── #}
-  {% include "partials/header.njk" %}
+  {# ── Site header — variant set via site.menuVariant in site.json ── #}
+  {%- set _headerPartial = "partials/header--" + site.menuVariant + ".njk" -%}
+  {% include _headerPartial %}
 
   {# ── Page content ── #}
   <main id="main" tabindex="-1">
@@ -98,6 +100,8 @@
 
   {# ── Main JS ── #}
   <script type="module" src="/js/main.js"></script>
+  <script type="module" src="/js/menu--{{ site.menuVariant }}.js"></script>
+
 
   {# ── Per-page script additions ── #}
   {% block scripts %}{% endblock %}

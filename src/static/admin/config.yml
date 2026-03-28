@@ -9,7 +9,8 @@ backend:
 
 # For local development: use the local backend proxy
 # Run: npx @sveltia/cms-backend-proxy
-# local_backend: true
+# Comment this out before going live
+local_backend: true
 
 media_library:
   name: cloudinary

@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Option 2 — Full-Screen Overlay with Stagger</title>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --duration-overlay: 0.45s;
+      --duration-item: 0.4s;
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1); /* expo out — snappy */
+      --accent: #e8ff47;
+      --menu-bg: #1a1a2e;
+      --toggle-size: 48px;
+    }
+
+    html {
+      scrollbar-gutter: stable;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      line-height: 1.6;
+      color: #1a1a1a;
+      background: #fafaf7;
+    }
+
+    body.menu-open {
+      overflow: hidden;
+    }
+
+    /* ── Page content ─────────────────────────────────── */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: #fafaf7;
+      border-bottom: 1px solid #ebebeb;
+      padding: 1rem 2rem;
+    }
+
+    .logo {
+      font-weight: 700;
+      font-size: 1.1rem;
+      letter-spacing: -0.02em;
+    }
+
+    .page-main {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 4rem 2rem;
+    }
+
+    .page-main h1 {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 1.5rem;
+    }
+
+    .page-main p {
+      font-size: 1.1rem;
+      color: #555;
+      margin-bottom: 1rem;
+      max-width: 60ch;
+    }
+
+    .demo-block {
+      margin-top: 3rem;
+      padding: 2rem;
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid #e8e8e0;
+    }
+
+    /* ── Toggle button ────────────────────────────────── */
+    .menu-toggle {
+      position: fixed;
+      top: 1.25rem;
+      right: 1.5rem;
+      z-index: 1000;
+      width: var(--toggle-size);
+      height: var(--toggle-size);
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+      padding: 6px;
+      border-radius: 8px;
+    }
+
+    .menu-toggle span {
+      display: block;
+      width: 26px;
+      height: 2px;
+      background: #111;
+      border-radius: 2px;
+      transform-origin: center center;
+      transition:
+        transform 0.4s var(--ease-out),
+        opacity   0.4s var(--ease-out),
+        background 0.3s ease,
+        width     0.4s var(--ease-out);
+      will-change: transform, opacity;
+    }
+
+    /* Active: hamburger → cross */
+    .menu-toggle.is-active span:nth-child(1) {
+      transform: translateY(8px) rotate(45deg);
+    }
+
+    .menu-toggle.is-active span:nth-child(2) {
+      opacity: 0;
+      width: 0;
+    }
+
+    .menu-toggle.is-active span:nth-child(3) {
+      transform: translateY(-8px) rotate(-45deg);
+    }
+
+    .menu-toggle.is-active span {
+      background: #fff;
+    }
+
+    /* ── Off-screen overlay ───────────────────────────── */
+    /*
+      Two-layer approach:
+        1. .nav-overlay  — the full-screen container, fades in
+        2. .nav-bg       — a slightly delayed background fill using scale,
+                           giving the impression the panel "inflates"
+    */
+    .nav-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      width: 100vw;
+      min-height: 100vh;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6rem 3rem 4rem;
+
+      /* Initial state */
+      opacity: 0;
+      pointer-events: none;
+      visibility: hidden;
+      transition:
+        opacity var(--duration-overlay) var(--ease-out),
+        visibility 0s linear var(--duration-overlay);
+    }
+
+    .nav-overlay.is-open {
+      opacity: 1;
+      pointer-events: auto;
+      visibility: visible;
+      transition:
+        opacity var(--duration-overlay) var(--ease-out),
+        visibility 0s linear 0s;
+    }
+
+    /* Background panel — scales up from center for a "bloom" feel */
+    .nav-overlay::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: var(--menu-bg);
+      transform: scale(1.04);
+      transition: transform var(--duration-overlay) var(--ease-out);
+      z-index: -1;
+    }
+
+    .nav-overlay.is-open::before {
+      transform: scale(1);
+    }
+
+    /* ── Nav content ──────────────────────────────────── */
+    .nav-inner {
+      width: 100%;
+      max-width: 900px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 3rem;
+    }
+
+    @media (min-width: 640px) {
+      .nav-inner {
+        grid-template-columns: 2fr 1fr;
+        align-items: start;
+      }
+    }
+
+    .nav-overlay ul {
+      list-style: none;
+    }
+
+    .nav-overlay ul li {
+      overflow: hidden; /* mask the slide-up */
+    }
+
+    /*
+      Each link starts translated down and invisible.
+      The .is-open class triggers staggered entrance via nth-child delays.
+    */
+    .nav-overlay a.primary-link {
+      display: block;
+      color: #fff;
+      text-decoration: none;
+      font-size: clamp(2.2rem, 6vw, 4rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      padding: 0.3em 0;
+      transform: translateY(110%);
+      opacity: 0;
+      transition:
+        transform var(--duration-item) var(--ease-out),
+        opacity   var(--duration-item) var(--ease-out),
+        color 0.2s ease;
+    }
+
+    .nav-overlay.is-open a.primary-link {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* Stagger delays for primary links */
+    .nav-overlay ul li:nth-child(1) a { transition-delay: 0.05s; }
+    .nav-overlay ul li:nth-child(2) a { transition-delay: 0.1s; }
+    .nav-overlay ul li:nth-child(3) a { transition-delay: 0.15s; }
+    .nav-overlay ul li:nth-child(4) a { transition-delay: 0.2s; }
+    .nav-overlay ul li:nth-child(5) a { transition-delay: 0.25s; }
+    .nav-overlay ul li:nth-child(6) a { transition-delay: 0.3s; }
+
+    .nav-overlay a.primary-link:hover {
+      color: var(--accent);
+    }
+
+    /* ── Side column ──────────────────────────────────── */
+    .nav-side {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+      transform: translateY(20px);
+      opacity: 0;
+      transition:
+        transform var(--duration-item) var(--ease-out) 0.3s,
+        opacity   var(--duration-item) var(--ease-out) 0.3s;
+    }
+
+    .nav-overlay.is-open .nav-side {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .nav-side h2 {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+      margin-bottom: 0.75rem;
+    }
+
+    .nav-side ul {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .nav-side a {
+      color: rgba(255,255,255,0.6) !important;
+      text-decoration: none;
+      font-size: 0.95rem !important;
+      font-weight: 400 !important;
+      letter-spacing: 0 !important;
+      transform: none !important;
+      opacity: 1 !important;
+      display: block !important;
+      padding: 0 !important;
+      transition: color 0.2s !important;
+    }
+
+    .nav-side a:hover {
+      color: #fff !important;
+    }
+
+    /* Override stagger for side column links */
+    .nav-side ul li:nth-child(n) a {
+      transition-delay: 0s !important;
+    }
+
+    /* ── Accent line ──────────────────────────────────── */
+    .nav-accent {
+      width: 0;
+      height: 3px;
+      background: var(--accent);
+      border-radius: 2px;
+      margin-bottom: 2rem;
+      transition: width 0.5s var(--ease-out) 0.1s;
+    }
+
+    .nav-overlay.is-open .nav-accent {
+      width: 60px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Toggle button -->
+  <button
+    class="menu-toggle"
+    id="menuToggle"
+    aria-label="Open menu"
+    aria-expanded="false"
+    aria-controls="navOverlay"
+  >
+    <span aria-hidden="true"></span>
+    <span aria-hidden="true"></span>
+    <span aria-hidden="true"></span>
+  </button>
+
+  <!-- Full-screen overlay nav -->
+  <nav
+    class="nav-overlay"
+    id="navOverlay"
+    aria-hidden="true"
+    aria-label="Main navigation"
+  >
+    <div class="nav-inner">
+      <!-- Primary nav -->
+      <div>
+        <div class="nav-accent"></div>
+        <ul>
+          <li><a href="#" class="primary-link">Home</a></li>
+          <li><a href="#" class="primary-link">About</a></li>
+          <li><a href="#" class="primary-link">Work</a></li>
+          <li><a href="#" class="primary-link">Services</a></li>
+          <li><a href="#" class="primary-link">Journal</a></li>
+          <li><a href="#" class="primary-link">Contact</a></li>
+        </ul>
+      </div>
+
+      <!-- Secondary / side column -->
+      <div class="nav-side">
+        <div>
+          <h2>Connect</h2>
+          <ul>
+            <li><a href="#">Twitter</a></li>
+            <li><a href="#">Instagram</a></li>
+            <li><a href="#">LinkedIn</a></li>
+            <li><a href="#">Dribbble</a></li>
+          </ul>
+        </div>
+        <div>
+          <h2>Legal</h2>
+          <ul>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms of Use</a></li>
+            <li><a href="#">Accessibility</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Page content -->
+  <header class="site-header">
+    <span class="logo">Studio&nbsp;Name</span>
+  </header>
+
+  <main class="page-main">
+    <h1>Full-Screen Overlay + Stagger</h1>
+    <p>
+      The overlay fades in and its background scales up from
+      <code>scale(1.04)</code> to <code>scale(1)</code> — a subtle "bloom"
+      that adds depth. Nav items then stagger up from below using
+      <code>translateY(110%)</code> with increasing <code>transition-delay</code>.
+    </p>
+    <p>
+      <code>scrollbar-gutter: stable</code> keeps the layout locked during the
+      <code>overflow: hidden</code> lock. The two-column layout collapses
+      gracefully on mobile.
+    </p>
+    <div class="demo-block">
+      <p>Open the menu to see the staggered entrance animation.</p>
+      <br>
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</p>
+      <br>
+      <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim.</p>
+      <br>
+      <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto.</p>
+      <br>
+      <p>At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati.</p>
+      <br>
+      <p>Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus, omnis voluptas assumenda est.</p>
+    </div>
+  </main>
+
+  <script>
+    (() => {
+      const toggle = document.getElementById('menuToggle');
+      const overlay = document.getElementById('navOverlay');
+      let isOpen = false;
+
+      function getScrollbarWidth() {
+        return window.innerWidth - document.documentElement.clientWidth;
+      }
+
+      const supportsScrollbarGutter = CSS.supports('scrollbar-gutter', 'stable');
+
+      function openMenu() {
+        if (!supportsScrollbarGutter) {
+          const sw = getScrollbarWidth();
+          document.body.style.paddingRight = sw + 'px';
+          toggle.style.right = (1.5 * 16 + sw) + 'px';
+        }
+        document.body.classList.add('menu-open');
+        toggle.classList.add('is-active');
+        overlay.classList.add('is-open');
+        toggle.setAttribute('aria-expanded', 'true');
+        toggle.setAttribute('aria-label', 'Close menu');
+        overlay.setAttribute('aria-hidden', 'false');
+        isOpen = true;
+        const firstLink = overlay.querySelector('a');
+        if (firstLink) firstLink.focus();
+      }
+
+      function closeMenu() {
+        document.body.classList.remove('menu-open');
+        if (!supportsScrollbarGutter) {
+          document.body.style.paddingRight = '';
+          toggle.style.right = '';
+        }
+        toggle.classList.remove('is-active');
+        overlay.classList.remove('is-open');
+        toggle.setAttribute('aria-expanded', 'false');
+        toggle.setAttribute('aria-label', 'Open menu');
+        overlay.setAttribute('aria-hidden', 'true');
+        isOpen = false;
+        toggle.focus();
+      }
+
+      toggle.addEventListener('click', () => {
+        isOpen ? closeMenu() : openMenu();
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && isOpen) closeMenu();
+      });
+
+      overlay.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', closeMenu);
+      });
+    })();
+  </script>
+</body>
+</html>
