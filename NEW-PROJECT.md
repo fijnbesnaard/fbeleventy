@@ -3,9 +3,16 @@
 Step-by-step guide for setting up a new client project using fbeleventy as a starter template.
 
 **Prerequisites:**
+
 - [GitHub CLI](https://cli.github.com) installed: `brew install gh`
-- `fijnbesnaard/fbeleventy` marked as a template repo on GitHub:
-  Settings → check **"Template repository"** (one-time, already done)
+- `fijnbesnaard/fbeleventy` marked as a template on GitHub:
+  Settings → check **"Template repository"** (one-time)
+- `gh` configured as the git credential helper (one-time per machine):
+  ```bash
+  gh auth setup-git
+  ```
+  This ensures `gh auth switch` also controls which account git pushes as.
+  Without it, macOS Keychain may cache the wrong account's credentials.
 
 ---
 
