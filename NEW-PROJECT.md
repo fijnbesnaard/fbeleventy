@@ -2,10 +2,10 @@
 
 Step-by-step guide for setting up a new client project using fbeleventy as a starter template.
 
-**Prerequisite:** [GitHub CLI](https://cli.github.com) (`gh`) must be installed.
-```bash
-brew install gh
-```
+**Prerequisites:**
+- [GitHub CLI](https://cli.github.com) installed: `brew install gh`
+- `fijnbesnaard/fbeleventy` marked as a template repo on GitHub:
+  Settings → check **"Template repository"** (one-time, already done)
 
 ---
 
