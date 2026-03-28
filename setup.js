@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * fbeleventy project setup
- * Run once after cloning the template for a new project:
+ * Run once after creating and cloning the repo via gh CLI:
  *   node setup.js
  */
 
@@ -29,10 +29,50 @@ function choose(question, options, defaultVal) {
   });
 }
 
+function ghExec(cmd) {
+  return execSync(cmd, { encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] }).trim();
+}
+
 async function main() {
   console.log('\n── fbeleventy new project setup ──\n');
 
-  // ── Gather input ───────────────────────────────────────────
+  // ── Check gh CLI is available ──────────────────────────────
+  try {
+    ghExec('gh --version');
+  } catch {
+    console.error('Error: gh CLI is not installed. See https://cli.github.com');
+    process.exit(1);
+  }
+
+  // ── Show current gh account ────────────────────────────────
+  let ghUser;
+  try {
+    ghUser = ghExec('gh api user -q .login');
+    console.log(`Logged in to GitHub as: ${ghUser}`);
+    const confirmed = await ask('Is this the correct account for this project? (y/n)', 'y');
+    if (confirmed.toLowerCase() !== 'y') {
+      console.log('\nRun: gh auth switch\nThen re-run this script.\n');
+      rl.close();
+      process.exit(0);
+    }
+  } catch {
+    console.error('Not logged in to gh. Run: gh auth login');
+    rl.close();
+    process.exit(1);
+  }
+
+  // ── Auto-detect GitHub repo ────────────────────────────────
+  let githubRepo;
+  try {
+    githubRepo = ghExec('gh repo view --json nameWithOwner -q .nameWithOwner');
+    console.log(`GitHub repo: ${githubRepo}\n`);
+  } catch {
+    console.error('Could not detect GitHub repo. Make sure you are inside the cloned project directory.');
+    rl.close();
+    process.exit(1);
+  }
+
+  // ── Gather project details ─────────────────────────────────
   const title       = await ask('Site title');
   const description = await ask('Site description');
   const url         = await ask('Production URL (no trailing slash)', 'https://example.com');
@@ -42,9 +82,6 @@ async function main() {
   const language    = await ask('Language code', 'nl');
   const locale      = await ask('Locale', 'nl_NL');
   const menuVariant = await choose('Menu variant', ['slide', 'overlay', 'clippath'], 'overlay');
-
-  console.log('\n── GitHub ────────────────────────────────────────────────');
-  const githubRepo  = await ask('GitHub repo (owner/repo, e.g. client/sitename)');
 
   console.log('\n── Cloudinary ────────────────────────────────────────────');
   const cloudName   = await ask('Cloud name');
@@ -89,12 +126,14 @@ async function main() {
   writeFileSync(eleventyPath, eleventy);
   console.log('✓ eleventy.config.js');
 
-  // ── Update git remote ──────────────────────────────────────
+  // ── Commit and push ────────────────────────────────────────
   try {
-    execSync(`git remote set-url origin https://github.com/${githubRepo}.git`, { stdio: 'pipe' });
-    console.log(`✓ git remote → https://github.com/${githubRepo}.git`);
+    execSync('git add src/_data/site.json src/static/admin/config.yml eleventy.config.js', { stdio: 'pipe' });
+    execSync(`git commit -m "Setup: configure for ${title}"`, { stdio: 'pipe' });
+    execSync('git push', { stdio: 'pipe' });
+    console.log('✓ Committed and pushed to GitHub');
   } catch {
-    console.log(`  (skipped git remote update — run manually if needed)`);
+    console.log('  (git commit/push skipped — no changes or push failed)');
   }
 
   // ── Done ───────────────────────────────────────────────────
@@ -102,8 +141,8 @@ async function main() {
   console.log('Next steps:');
   console.log('  npm install');
   console.log('  npm start');
-  console.log(`  Site:  http://localhost:8080`);
-  console.log(`  CMS:   http://localhost:8080/admin/\n`);
+  console.log('  Site:  http://localhost:8080');
+  console.log('  CMS:   http://localhost:8080/admin/\n');
   console.log('Still to do manually:');
   console.log('  • Fonts → src/fonts/ + uncomment @font-face in base.css');
   console.log('  • Brand colors → src/css/tokens/colors.css');

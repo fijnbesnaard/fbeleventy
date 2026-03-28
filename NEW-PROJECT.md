@@ -2,6 +2,11 @@
 
 Step-by-step guide for setting up a new client project using fbeleventy as a starter template.
 
+**Prerequisite:** [GitHub CLI](https://cli.github.com) (`gh`) must be installed.
+```bash
+brew install gh
+```
+
 ---
 
 ## 1. Create accounts
@@ -17,30 +22,53 @@ Use the client's dedicated email address for each service.
 
 ---
 
-## 2. Create the GitHub repo from the template
+## 2. Switch to the client's GitHub account
 
-1. Go to `github.com/fijnbesnaard/fbeleventy`
-2. Click **Use this template → Create a new repository**
-3. Set owner to the client's GitHub account
-4. Name the repo (e.g. `client-sitename`)
-5. Set visibility (private recommended) → **Create repository**
+If you've logged in before with a different account, add the new one:
+
+```bash
+gh auth login
+```
+
+Follow the prompts: select **GitHub.com → HTTPS → Login with a web browser**. This adds the client account without removing yours.
+
+To switch between accounts at any time:
+```bash
+gh auth switch
+gh auth status   # confirm who you're now acting as
+```
 
 ---
 
-## 3. Clone and run the setup script
+## 3. Create the repo from the template and clone it
 
 ```bash
-git clone https://github.com/[client]/[repo].git
-cd [repo]
+gh repo create client/sitename \
+  --private \
+  --template fijnbesnaard/fbeleventy \
+  --clone
+
+cd sitename
+```
+
+This creates the repo under the client's account, copies the template, and clones it locally in one step. Authentication for pushes is handled automatically by `gh`.
+
+---
+
+## 4. Run the setup script
+
+```bash
 node setup.js
 ```
 
-The setup script will prompt for all project details and automatically patches:
-- `src/_data/site.json` — title, URL, author, locale, menu variant
-- `src/static/admin/config.yml` — GitHub repo, Cloudinary credentials
-- `eleventy.config.js` — RSS feed metadata
+The script will:
+1. Confirm you're acting as the right GitHub account (prompts if not)
+2. Auto-detect the GitHub repo from the cloned directory
+3. Prompt for project details (title, URL, author, Cloudinary credentials, menu variant)
+4. Patch `src/_data/site.json`, `src/static/admin/config.yml`, `eleventy.config.js`
+5. Commit and push the changes
 
-After the script completes:
+Then:
 
 ```bash
 npm install
@@ -52,7 +80,7 @@ npm start
 
 ---
 
-## 4. Manual setup (not automated)
+## 5. Manual setup (not automated)
 
 These require files or design decisions — handle them per project:
 
@@ -66,7 +94,7 @@ These require files or design decisions — handle them per project:
 
 ---
 
-## 5. Connect Netlify
+## 6. Connect Netlify
 
 1. Netlify dashboard → **Add new site → Import an existing project → GitHub**
 2. Authorize Netlify on the client's GitHub account
@@ -83,7 +111,7 @@ These require files or design decisions — handle them per project:
 
 ---
 
-## 6. Point the domain (when ready)
+## 7. Point the domain (when ready)
 
 1. Netlify → Domain settings → **Add custom domain**
 2. Update DNS at the registrar (Netlify's nameservers or CNAME)
@@ -91,7 +119,7 @@ These require files or design decisions — handle them per project:
 
 ---
 
-## 7. Go live checklist
+## 8. Go live checklist
 
 Before switching on the domain:
 
@@ -115,3 +143,13 @@ Before switching on the domain:
 | CMS collections | `src/static/admin/config.yml` |
 | Global site data | `src/_data/site.json` |
 | RSS feed config | `eleventy.config.js` → feedPlugin metadata |
+
+## Switching between client accounts
+
+```bash
+gh auth status          # see all logged-in accounts and who's active
+gh auth switch          # interactive account switcher
+gh auth login           # add another account
+```
+
+Always run `gh auth status` before creating a new repo to confirm you're acting as the right account.
